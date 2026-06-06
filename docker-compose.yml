@@ -1,0 +1,67 @@
+services:
+
+  # ─── BACKEND Laravel ───────────────────────────────
+  backend:
+    build:
+      context: ./docker/php
+    container_name: portfolio_backend
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: portfolio
+      DB_USERNAME: portfolio_user
+      DB_PASSWORD: secret
+    networks:
+      - portfolio_net
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  # ─── FRONTEND React ────────────────────────────────
+  frontend:
+    build:
+      context: ./docker/node
+    container_name: portfolio_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - portfolio_net
+    command: sh -c "npm install && npm run dev -- --host"
+
+  # ─── BASE DE DONNÉES MySQL ─────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: portfolio_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: portfolio
+      MYSQL_USER: portfolio_user
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - portfolio_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  portfolio_net:
+    driver: bridge
+
+volumes:
+  mysql_data:

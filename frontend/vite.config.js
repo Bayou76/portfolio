@@ -10,6 +10,20 @@ export default defineConfig({
       '/api': {
         target: 'http://backend:8000',
         changeOrigin: true,
+        followRedirects: false,
+        configure: (proxy) => {
+          proxy.on('error', (err) => console.log('Proxy error:', err))
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('Proxying:', req.method, req.url)
+          })
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log('Response:', proxyRes.statusCode, req.method, req.url)
+          })
+        }
+      },
+      '/storage': {
+        target: 'http://backend:8000',
+        changeOrigin: true,
       }
     }
   }

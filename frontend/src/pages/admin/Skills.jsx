@@ -12,10 +12,12 @@ export default function AdminSkills() {
   const [editing, setEditing] = useState(null);
 
   const items = list ?? skills;
-  const token = localStorage.getItem("admin_token");
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
+
+  const getHeaders = (json = true) => {
+    const token = localStorage.getItem("admin_token");
+    const h = { Authorization: `Bearer ${token}`, Accept: "application/json" };
+    if (json) h["Content-Type"] = "application/json";
+    return h;
   };
 
   const openCreate = () => {
@@ -30,37 +32,45 @@ export default function AdminSkills() {
   };
 
   const handleSave = async () => {
-    if (editing) {
-      const res = await fetch(`/api/skills/${editing}`, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify(form),
-      });
-      const updated = await res.json();
-      setList(items.map((s) => (s.id === editing ? updated : s)));
-    } else {
-      const res = await fetch("/api/skills", {
-        method: "POST",
-        headers,
-        body: JSON.stringify(form),
-      });
-      const created = await res.json();
-      setList([...items, created]);
+    const payload = {
+      name: form.name,
+      category: form.category,
+      level: parseInt(form.level),
+      order: parseInt(form.order) || 0,
+    };
+
+    try {
+      if (editing) {
+        const res = await fetch(`/api/skills/${editing}`, {
+          method: "PUT",
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const updated = await res.json();
+        setList(items.map((s) => (s.id === editing ? updated : s)));
+      } else {
+        const res = await fetch("/api/skills", {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const created = await res.json();
+        setList([...items, created]);
+      }
+      setModal(false);
+    } catch (err) {
+      console.error("Erreur:", err);
+      alert("Erreur: " + err.message);
     }
-    setModal(false);
   };
 
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ?")) return;
-    await fetch(`/api/skills/${id}`, { method: "DELETE", headers });
+    await fetch(`/api/skills/${id}`, {
+      method: "DELETE",
+      headers: getHeaders(false),
+    });
     setList(items.filter((s) => s.id !== id));
-  };
-
-  const catColors = {
-    frontend: "purple",
-    backend: "cyan",
-    devops: "green",
-    outils: "orange",
   };
 
   return (
@@ -69,7 +79,7 @@ export default function AdminSkills() {
         <h2 className="text-2xl font-bold text-white">🛠 Compétences</h2>
         <button
           onClick={openCreate}
-          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl text-sm font-semibold hover:opacity-90"
+          className="px-4 py-2 bg-gradient-to-r from-rose-500 to-orange-500 rounded-xl text-sm font-semibold hover:opacity-90"
         >
           + Ajouter
         </button>
@@ -91,7 +101,7 @@ export default function AdminSkills() {
                 </div>
                 <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-rose-500 to-orange-500 rounded-full"
                     style={{ width: `${s.level}%` }}
                   />
                 </div>
@@ -128,12 +138,12 @@ export default function AdminSkills() {
               placeholder="Nom"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-rose-500"
             />
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-rose-500"
             >
               <option value="frontend">Front-end</option>
               <option value="backend">Back-end</option>
@@ -152,13 +162,13 @@ export default function AdminSkills() {
                 onChange={(e) =>
                   setForm({ ...form, level: parseInt(e.target.value) })
                 }
-                className="w-full accent-purple-500"
+                className="w-full accent-rose-500"
               />
             </div>
             <div className="flex gap-3 pt-2">
               <button
                 onClick={handleSave}
-                className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl font-semibold hover:opacity-90"
+                className="flex-1 py-3 bg-gradient-to-r from-rose-500 to-orange-500 rounded-xl font-semibold hover:opacity-90"
               >
                 Sauvegarder
               </button>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useFetch } from "../../hooks/useFetch";
-import { api } from "../../services/api";
+import { api, BASE_URL } from "../../services/api";
 
 const empty = {
   company: "",
@@ -52,7 +52,7 @@ export default function AdminExperiences() {
 
     try {
       if (editing) {
-        const res = await fetch(`/api/experiences/${editing}`, {
+        const res = await fetch(`${BASE_URL}/api/experiences/${editing}`, {
           method: "PUT",
           headers: getHeaders(),
           body: JSON.stringify(payload),
@@ -60,7 +60,7 @@ export default function AdminExperiences() {
         const updated = await res.json();
         setList(items.map((e) => (e.id === editing ? updated : e)));
       } else {
-        const res = await fetch("/api/experiences", {
+        const res = await fetch(`${BASE_URL}/api/experiences`, {
           method: "POST",
           headers: getHeaders(),
           body: JSON.stringify(payload),
@@ -77,7 +77,7 @@ export default function AdminExperiences() {
 
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ?")) return;
-    await fetch(`/api/experiences/${id}`, {
+    await fetch(`${BASE_URL}/api/experiences/${id}`, {
       method: "DELETE",
       headers: getHeaders(false),
     });

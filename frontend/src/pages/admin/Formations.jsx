@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useFetch } from "../../hooks/useFetch";
-import { api } from "../../services/api";
+import { api, BASE_URL } from "../../services/api";
 
 const empty = {
   school: "",
@@ -50,7 +50,7 @@ export default function AdminFormations() {
 
     try {
       if (editing) {
-        const res = await fetch(`/api/formations/${editing}`, {
+        const res = await fetch(`${BASE_URL}/api/formations/${editing}`, {
           method: "PUT",
           headers: getHeaders(),
           body: JSON.stringify(payload),
@@ -58,7 +58,7 @@ export default function AdminFormations() {
         const updated = await res.json();
         setList(items.map((f) => (f.id === editing ? updated : f)));
       } else {
-        const res = await fetch("/api/formations", {
+        const res = await fetch(`${BASE_URL}/api/formations`, {
           method: "POST",
           headers: getHeaders(),
           body: JSON.stringify(payload),
@@ -75,7 +75,7 @@ export default function AdminFormations() {
 
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ?")) return;
-    await fetch(`/api/formations/${id}`, {
+    await fetch(`${BASE_URL}/api/formations/${id}`, {
       method: "DELETE",
       headers: getHeaders(false),
     });

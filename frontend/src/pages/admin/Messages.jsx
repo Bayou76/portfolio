@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../../services/api";
 
 export default function AdminMessages() {
   const [messages, setMessages] = useState([]);
@@ -9,7 +10,7 @@ export default function AdminMessages() {
   const headers = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
-    fetch("/api/messages", { headers })
+    fetch(BASE_URL + "/api/messages", { headers })
       .then((r) => r.json())
       .then((data) => {
         setMessages(data);
@@ -19,7 +20,10 @@ export default function AdminMessages() {
 
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ce message ?")) return;
-    await fetch(`/api/messages/${id}`, { method: "DELETE", headers });
+    await fetch(`${BASE_URL}/api/messages/${id}`, {
+      method: "DELETE",
+      headers,
+    });
     setMessages(messages.filter((m) => m.id !== id));
     if (selected?.id === id) setSelected(null);
   };
@@ -27,7 +31,7 @@ export default function AdminMessages() {
   const handleRead = async (msg) => {
     setSelected(msg);
     if (!msg.read) {
-      await fetch(`/api/messages/${msg.id}`, { headers });
+      await fetch(`${BASE_URL}/api/messages/${msg.id}`, { headers });
       setMessages(
         messages.map((m) => (m.id === msg.id ? { ...m, read: true } : m)),
       );

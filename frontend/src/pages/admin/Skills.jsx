@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useFetch } from "../../hooks/useFetch";
-import { api } from "../../services/api";
+import { api, BASE_URL } from "../../services/api";
 
 const empty = { name: "", category: "frontend", level: 80, order: 0 };
 
@@ -41,7 +41,7 @@ export default function AdminSkills() {
 
     try {
       if (editing) {
-        const res = await fetch(`/api/skills/${editing}`, {
+        const res = await fetch(`${BASE_URL}/api/skills/${editing}`, {
           method: "PUT",
           headers: getHeaders(),
           body: JSON.stringify(payload),
@@ -49,7 +49,7 @@ export default function AdminSkills() {
         const updated = await res.json();
         setList(items.map((s) => (s.id === editing ? updated : s)));
       } else {
-        const res = await fetch("/api/skills", {
+        const res = await fetch(`${BASE_URL}/api/skills`, {
           method: "POST",
           headers: getHeaders(),
           body: JSON.stringify(payload),
@@ -66,7 +66,7 @@ export default function AdminSkills() {
 
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ?")) return;
-    await fetch(`/api/skills/${id}`, {
+    await fetch(`${BASE_URL}/api/skills/${id}`, {
       method: "DELETE",
       headers: getHeaders(false),
     });

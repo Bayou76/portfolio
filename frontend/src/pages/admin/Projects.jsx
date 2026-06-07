@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useFetch } from "../../hooks/useFetch";
-import { api } from "../../services/api";
-
+import { api, BASE_URL } from "../../services/api";
 const empty = {
   title: "",
   description: "",
@@ -55,7 +54,7 @@ export default function AdminProjects() {
       if (imageFile) {
         const imgData = new FormData();
         imgData.append("image", imageFile);
-        const imgRes = await fetch("/api/projects/image", {
+        const imgRes = await fetch(BASE_URL + "/api/projects/image", {
           method: "POST",
           headers: {
             ...headers,
@@ -88,7 +87,7 @@ export default function AdminProjects() {
       const jsonHeaders = { ...headers, "Content-Type": "application/json" };
 
       if (editing) {
-        const res = await fetch(`/api/projects/${editing}`, {
+        const res = await fetch(`${BASE_URL}/api/projects/${editing}`, {
           method: "PUT",
           headers: jsonHeaders,
           body: JSON.stringify(payload),
@@ -97,7 +96,7 @@ export default function AdminProjects() {
         const updated = JSON.parse(text);
         setList(items.map((p) => (p.id === editing ? updated : p)));
       } else {
-        const res = await fetch("/api/projects", {
+        const res = await fetch(`${BASE_URL}/api/projects`, {
           method: "POST",
           headers: jsonHeaders,
           body: JSON.stringify(payload),
@@ -116,7 +115,7 @@ export default function AdminProjects() {
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ce projet ?")) return;
     const token = localStorage.getItem("admin_token");
-    await fetch(`/api/projects/${id}`, {
+    await fetch(`${BASE_URL}/api/projects/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

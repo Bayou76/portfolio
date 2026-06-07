@@ -12,11 +12,14 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        (import.meta.env.VITE_API_URL || "") + "/api/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        },
+      );
       if (!res.ok) throw new Error("Identifiants incorrects");
       const data = await res.json();
       localStorage.setItem("admin_token", data.token);

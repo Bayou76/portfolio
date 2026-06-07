@@ -1,9 +1,9 @@
-const BASE_URL = "/api";
+const BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "/api";
 
 async function request(method, endpoint, data = null) {
   const options = {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
   };
   if (data) options.body = JSON.stringify(data);
   const response = await fetch(`${BASE_URL}${endpoint}`, options);
